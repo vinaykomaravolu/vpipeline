@@ -157,15 +157,19 @@ TEST(PipelineTest, MultipleComponents)
     shared_ptr<Transform> t(new Transform());
     shared_ptr<Rigidbody> r(new Rigidbody());
     shared_ptr<Info> i(new Info("Testing game object"));
-    (*g)["Transform"] = t;
-    (*g)["Rigidbody"] = r;
-    (*g)["Info"] = i;
+    //(*g)["Transform"] = t;
+    //(*g)["Rigidbody"] = r;
+    //(*g)["Info"] = i;
+    g->setComponent("Transform", t);
+    g->setComponent("Rigidbody", r);
+    g->setComponent("Info", i);
+
     EXPECT_EQ(3, g->size());
     p.pushPipelineNode("Move", [](shared_ptr<ComponentsContainer> c)
                        {
                            if (c->count("Transform"))
                            {
-                               shared_ptr<Transform> t = static_pointer_cast<Transform>((*c)["Transform"]);
+                               shared_ptr<Transform> t = c->getComponent<Transform>("Transform");
                                t->position[0] = 10.f;
                                t->position[2] = 5.f;
                            }
@@ -182,7 +186,7 @@ TEST(PipelineTest, MultipleComponents)
                            }
                        });
     p.setInput(g);
-    shared_ptr<GameObject> result = static_pointer_cast<GameObject>(p.process());
+    shared_ptr<GameObject> result = p.process<GameObject>();
     EXPECT_EQ(true, result != NULL);
     shared_ptr<Transform> tresult = static_pointer_cast<Transform>((*result)["Transform"]);
     shared_ptr<Rigidbody> rresult = static_pointer_cast<Rigidbody>((*result)["Rigidbody"]);

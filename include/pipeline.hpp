@@ -51,6 +51,22 @@ public:
             (*this)[it->first] = it->second;
         }
     }
+
+    void setComponent(string id, shared_ptr<Component> c)
+    {
+        this->insert(make_pair(id, c));
+    }
+
+    template <typename T>
+    shared_ptr<T> getComponent(string id)
+    {
+        return static_pointer_cast<T>(this->at(id));
+    }
+
+    void removeComponent(string id)
+    {
+        this->erase(id);
+    }
 };
 
 class PipelineNode
@@ -93,7 +109,8 @@ public:
         ccSet = true;
     }
 
-    shared_ptr<ComponentsContainer> process()
+    template <typename T = ComponentsContainer>
+    shared_ptr<T> process()
     {
         if (!ccSet)
         {
@@ -106,7 +123,7 @@ public:
             curr->func(processed);
             curr = curr->next;
         }
-        return processed;
+        return static_pointer_cast<T>(processed);
     }
 
     PipelineResult pushPipelineNode(string id, function<void(shared_ptr<ComponentsContainer>)> func)
